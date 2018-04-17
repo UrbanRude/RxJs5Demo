@@ -1,0 +1,14 @@
+[
+    {
+        "category":"Jedi",
+        "name":"Luke"
+    },
+    {
+        "category":"Lord Sith",
+        "name":"Darth Vader"
+    },
+    {
+        "category":"Jedi",
+        "name":"Obi Wan Kenobi"
+    }
+]
