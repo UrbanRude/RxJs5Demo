@@ -1,17 +1,24 @@
 import {Observable,Observer} from "rxjs";
+import { elementAt } from "rxjs/operators";
 
 let output = document.getElementById('output');
 let button = document.getElementById('button');
+let buttonPasaron = document.getElementById('buttonPass');
+let buttonMax = document.getElementById('buttonMax');
 
-let click = Observable.fromEvent(button,'click');
+let inputLetter = <HTMLInputElement> document.getElementById('firstLetter')
+
+let clickPass = Observable.fromEvent(buttonPasaron,'click');
+let clickLetter = Observable.fromEvent(button,'click');
+let clickMax = Observable.fromEvent(buttonMax,'click');
 
 function load(url:string){
     return Observable.create((observer) => {
         let xhr = new XMLHttpRequest();
         xhr.addEventListener('load',() =>{
             if(xhr.status === 200){
-                let jsonStarwars = JSON.parse(xhr.responseText);
-                observer.next(jsonStarwars);
+                let jsonAlumnos = JSON.parse(xhr.responseText);
+                observer.next(jsonAlumnos);
                 observer.complete();
             }else{
                 observer.error(xhr.statusText);
@@ -20,32 +27,43 @@ function load(url:string){
         xhr.open('GET',url);
         xhr.send();
     });
-    
 }
 
-function renderStarWars(jsonStarwars){
-        jsonStarwars.forEach(element => {
-            let div = document.createElement('div');
-            div.innerText = element.name;
+function renderPassAlumnos(jsonAlumnos){
+    jsonAlumnos.forEach(element => {
+        let div = document.createElement('div');
+        if(element.calificacion > 60){
+            console.log(element.calificacion);
+            div.innerText = `*Nombre >> ${element.nombre} --- ${element.calificacion}`;
             output.appendChild(div);
-        });
+        }   
+    });
 }
 
-click.subscribe(
-    value => {
-        load('starwars.json')
-            .subscribe(value=>{
-                        console.log(value);
-                        renderStarWars(value);
-                    },
-                        error=>{
-                            console.log(`Error >> ${error}`);
-                        });
-    },
-    error => {
-        console.log(`Error`);
-    },
-    () => {
-        console.log('Complete');
-    }
-);
+clickPass.flatMap(
+    x => load('alumnos.json')).subscribe(value => {
+            renderPassAlumnos(value);
+        },error => {
+            console.log('Error');
+        });
+
+clickLetter.subscribe(x => load('alumnos.json').subscribe(value => Observable.from(value)
+.filter((alumnos:any) => { 
+    return alumnos.nombre.startsWith(inputLetter.value)})
+    //.toArray(x => )
+.subscribe(x => console.log(x))));
+
+function renderMaxAlumnos(jsonAlumnos){
+    let a = [];
+    jsonAlumnos.forEach(element => {
+        a.push(element.calificacion);
+    });
+    return Observable.from(a);
+}
+
+clickMax.flatMap(
+    x => load('alumnos.json')).subscribe(value => {
+            renderMaxAlumnos(value);
+        },error => {
+            console.log('Error');
+        });
