@@ -50,8 +50,18 @@ clickPass.flatMap(
 clickLetter.subscribe(x => load('alumnos.json').subscribe(value => Observable.from(value)
 .filter((alumnos:any) => { 
     return alumnos.nombre.startsWith(inputLetter.value)})
-    //.toArray(x => )
 .subscribe(x => console.log(x))));
+
+clickMax.flatMap(
+    x => load('alumnos.json')).subscribe(value => {
+            renderMaxAlumnos(value)
+            .max().subscribe(x => {console.log(x)});
+        },error => {
+            console.log('Error');
+        });
+/*
+clickMax.flatMap(
+        x => load('alumnos.json')).toArray().subscribe(x => {console.log(x)});*/
 
 function renderMaxAlumnos(jsonAlumnos){
     let a = [];
@@ -60,10 +70,3 @@ function renderMaxAlumnos(jsonAlumnos){
     });
     return Observable.from(a);
 }
-
-clickMax.flatMap(
-    x => load('alumnos.json')).subscribe(value => {
-            renderMaxAlumnos(value);
-        },error => {
-            console.log('Error');
-        });
